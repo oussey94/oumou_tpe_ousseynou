@@ -18,8 +18,8 @@ public class TpeOumouApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-       // etudiantService.addEtudiant(new Etudiant(null,"Oumou","Aidara",20));
-        //etudiantService.addEtudiant(new Etudiant(null,"Oussey","Mbodji",25));
+       etudiantService.addEtudiant(new Etudiant(null,"Oumou","Aidara",20));
+       etudiantService.addEtudiant(new Etudiant(null,"Oussey","Mbodji",25));
 
     }
 }

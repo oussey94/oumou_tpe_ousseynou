@@ -1,0 +1,42 @@
+version: '3'
+services:
+  article-db:
+    container_name: article-db
+    image: mysql:8.0
+    networks:
+      - article-network
+    environment:
+      - MYSQL_USER=mbodjiousseynou
+      - MYSQL_PASSWORD=articlepassword
+      - MYSQL_DATABASE=docker_article_db
+      - MYSQL_ROOT_PASSWORD=somone
+    volumes:
+      - mbvol:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: always
+
+  article-app:
+    build:
+      context: .
+    container_name: article-app
+    image: mbodji/spring_app:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - article-network
+    depends_on:
+      - article-db
+    environment:
+      - MYSQL_HOST=article-db
+      - MYSQL_USERNAME=mbodjiousseynou
+      - MYSQL_PASSWORD=articlepassword
+      - MYSQL_DATABASE=docker_article_db
+      - MYSQL_PORT=3306
+
+networks:
+  article-network:
+    name: article-network
+
+volumes:
+  mbvol:
