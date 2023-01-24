@@ -33,7 +33,7 @@ services:
       - MYSQL_PASSWORD=articlepassword
       - MYSQL_DATABASE=docker_article_db
       - MYSQL_PORT=3306
-
+    
 networks:
   article-network:
     name: article-network
