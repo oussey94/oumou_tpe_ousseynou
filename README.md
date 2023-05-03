@@ -169,20 +169,20 @@ spec:
             storage: 1Gi
 ```
 ```yaml
-# Define a 'Service' To Expose mysql to Other Services
+# Définition du 'Service' pour exposer mysql
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql  # DNS name 
+  name: mysql  # Nom DNS
   labels:
     app: mysql
 spec:
   ports:
     - port: 3306
       targetPort: 3306
-  selector:       # mysql Pod Should contain same labels
+  selector:       # le Pod mysql doit contenir les mêmes labels
     app: mysql
-  clusterIP: None  # We Use DNS, Thus ClusterIP is not relevant 
+  clusterIP: None  # Nous utilisons DNS, donc ClusterIP n'est pas pertinent 
 ```
   * pour l'api
 ```yaml
@@ -193,35 +193,35 @@ metadata:
   labels:
     app: springboot
 spec:
-  replicas: 1 # Number of replicas of back-end application to be deployed
+  replicas: 1 # Nombre de réplicas de l'api à déployer
   selector:
-    matchLabels: # backend application pod labels should match these
+    matchLabels: # Les labels de pod d'api doivent correspondre à celles-ci
       app: springboot
   template:
     metadata:
-      labels: # Must macth 'Service' and 'Deployment' labels
+      labels: # Doit comporter les moms de labels identiques que celui du "Service" et du "Déploiement"
         app: springboot
     spec:
       containers:
         - name: api-spring
-          image: mbodji/api-spring-test:v2.0 # docker image of backend application
-          env: # Setting Enviornmental Variables
-            - name: MYSQL_HOST # Setting Database host address from configMap
+          image: mbodji/api-spring-test:v2.0 # image docker de l'api
+          env: # Définition des variables d'environnement
+            - name: MYSQL_HOST # Définition de l'adresse de l'hôte de la base de données à partir de configMap
               valueFrom:
                 configMapKeyRef:
-                  name: api-configmap # name of configMap
+                  name: api-configmap # nom du configMap
                   key: mysql_host
-            - name: MYSQL_DATABASE # Setting Database name from configMap
+            - name: MYSQL_DATABASE # Définition du nom de la base de données à partir de configMap
               valueFrom:
                 configMapKeyRef:
                   name: api-configmap
                   key: mysql_database
-            - name: MYSQL_USERNAME # Setting Database username from Secret
+            - name: MYSQL_USERNAME # Définition du nom d'utilisateur de la base de données à partir du secret
               valueFrom:
                 secretKeyRef:
-                  name: api-secret # Secret Name
+                  name: api-secret # nom du secret
                   key: mysql_user
-            - name: MYSQL_PASSWORD # Setting Database password from Secret
+            - name: MYSQL_PASSWORD # Définition du mot de passe de la base de données à partir du secret
               valueFrom:
                 secretKeyRef:
                   name: api-secret
@@ -229,4 +229,22 @@ spec:
           ports:
             - containerPort: 8080
 ```
+```yaml
+# Définition du 'Service' pour exposer le déploiement de l'api
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-service
+  labels:
+    app: springboot
+spec:
+  selector:  # les labels de pod de l'api doivent correspondre à celles-ci
+    app: springboot
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer   # utilisez NodePort, si vous n'exécutez pas Kubernetes sur le cloud
+```
+
 
