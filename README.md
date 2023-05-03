@@ -47,7 +47,7 @@ Ces objets Kubernetes contiendront l'état souhaité de notre déploiement. Une 
 
 Kubernetes prend en charge les méthodes impératives et déclaratives de création d'objets. Les environnements de production sont généralement configurés par l'approche déclarative. Nous utiliserons l'approche déclarative dans cet exemple. Pour chaque objet, nous allons d'abord préparer un fichier manifeste qui est un fichier .yaml contenant toutes les informations liées à l'objet. Ensuite, nous exécuterons la commande kubectl `kubectl apply -f <FILE_NAME>` pour conserver l'objet dans le magasin d'état du cluster (ETCD).
 
-* Mais avant cela nous allons d'abord conteneuriser le code de l'application que nous avons implémenté avec le Dockerfile
+* Mais avant cela nous allons d'abord conteneuriser le code de l'application que nous avons implémenté avec le Dockerfile:
 
 ``` yaml
     # Première étape : Compiler le projet Spring Boot
@@ -65,20 +65,20 @@ Kubernetes prend en charge les méthodes impératives et déclaratives de créat
 ` docker build -t mbodji/api-spring-test:v2.0 . `
 ` docker push mbodji/api-spring-test:v2.0 `
 
-* Ensuite configurer la base de données
+* Ensuite configurer la base de données:
 
 Les instances principales doivent communiquer avec la base de données. Tous les détails de configuration requis pour se connecter à la base de données sont stockés dans un fichier de configuration: `application.properties `.
 Ce fichier de configuration attend certaines variables d'environnement, comme :
-* * MYSQL_USERNAME, 
-* * MYSQL_PASSWORD, 
-* * MYSQL_HOST, 
-* * MYSQL_DATABASE. 
+  * MYSQL_USERNAME, 
+  * MYSQL_PASSWORD, 
+  * MYSQL_HOST, 
+  * MYSQL_DATABASE. 
 
 L'image du docker de la base de données MySQL aussi attend certaines variables d'environnement comme:
-* * MYSQL_ROOT_PASSWORD, 
-* * MYSQL_USER, 
-* * MYSQL_PASSWORD, 
-* * MYSQL_DATABASE.
+  * MYSQL_ROOT_PASSWORD, 
+  * MYSQL_USER, 
+  * MYSQL_PASSWORD, 
+  * MYSQL_DATABASE.
 
 Nous transmettrons les valeurs de ces variables à Kubernetes via `app-configmap.yaml` et `app-secret.yaml`.
 
@@ -88,7 +88,6 @@ kind: ConfigMap
 metadata:
   name: api-configmap
 data:
-  # property-like keys; each key maps to a simple value
   mysql_host: mysql
   mysql_database: testDbForArticle
   #mysql_port: 3306
@@ -108,4 +107,126 @@ data:
 
 Nos pods seront configurés pour lire les variables d'environnements à partir du configMaps et du secrets.
 
-* Enfin nous crérons nos services, statefullset et déploiement .
+* Enfin nous crérons nos services, statefullset et déploiement:
+  * pour la base de données
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-sts
+spec:
+  replicas: 1
+  serviceName: mysql
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - name: tpc
+              protocol: TCP
+              containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom: 
+               secretKeyRef: 
+                key: mysql_root_password
+                name: api-secret
+            - name: MYSQL_PASSWORD
+              valueFrom: 
+               secretKeyRef: 
+                key: mysql_password
+                name: api-secret
+            - name: MYSQL_USER
+              valueFrom: 
+               secretKeyRef: 
+                key: mysql_user
+                name: api-secret
+            - name: MYSQL_DATABASE
+              valueFrom: 
+               configMapKeyRef: 
+                key: mysql_database
+                name: api-configmap
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+```
+```yaml
+# Define a 'Service' To Expose mysql to Other Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql  # DNS name 
+  labels:
+    app: mysql
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:       # mysql Pod Should contain same labels
+    app: mysql
+  clusterIP: None  # We Use DNS, Thus ClusterIP is not relevant 
+```
+  * pour l'api
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-test-api
+  labels:
+    app: springboot
+spec:
+  replicas: 1 # Number of replicas of back-end application to be deployed
+  selector:
+    matchLabels: # backend application pod labels should match these
+      app: springboot
+  template:
+    metadata:
+      labels: # Must macth 'Service' and 'Deployment' labels
+        app: springboot
+    spec:
+      containers:
+        - name: api-spring
+          image: mbodji/api-spring-test:v2.0 # docker image of backend application
+          env: # Setting Enviornmental Variables
+            - name: MYSQL_HOST # Setting Database host address from configMap
+              valueFrom:
+                configMapKeyRef:
+                  name: api-configmap # name of configMap
+                  key: mysql_host
+            - name: MYSQL_DATABASE # Setting Database name from configMap
+              valueFrom:
+                configMapKeyRef:
+                  name: api-configmap
+                  key: mysql_database
+            - name: MYSQL_USERNAME # Setting Database username from Secret
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret # Secret Name
+                  key: mysql_user
+            - name: MYSQL_PASSWORD # Setting Database password from Secret
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: mysql_password
+          ports:
+            - containerPort: 8080
+```
+
