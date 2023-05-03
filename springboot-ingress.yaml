@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+   #kubernetes.io/ingress.global-static-ip-name: 130.211.109.194
+   # nginx.ingress.kubernetes.io/service-upstream: "true"
+  namespace: test
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.spring.test
+    #secretName: prod-beopenit-acad-tls
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: springboot-service
+            port:
+              number: 80
+
+
+    host: "api.spring.test"
