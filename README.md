@@ -28,7 +28,7 @@ les éléments liés à la base de données sont inclus dans le paramètre.
 
 docker-composer up -d
 
-## ===========================================================================
+### =======================================================================
 
 ## Exemple simple d'utilisation Kubernetes avec MYSQL et Spring Boot
 
@@ -69,7 +69,7 @@ Kubernetes prend en charge les méthodes impératives et déclaratives de créat
 
 Les instances principales doivent communiquer avec la base de données. Tous les détails de configuration requis pour se connecter à la base de données sont stockés dans un fichier de configuration: `application.properties `.
 Ce fichier de configuration attend certaines variables d'environnement, comme :
-  * MYSQL_USERNAME, 
+*   MYSQL_USERNAME, 
   * MYSQL_PASSWORD, 
   * MYSQL_HOST, 
   * MYSQL_DATABASE. 

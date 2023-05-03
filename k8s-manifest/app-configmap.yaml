@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: api-configmap
 data:
-  # property-like keys; each key maps to a simple value
+  
   mysql_host: mysql
   mysql_database: testDbForArticle
   #mysql_port: 3306
