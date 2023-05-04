@@ -69,16 +69,16 @@ Kubernetes prend en charge les méthodes impératives et déclaratives de créat
 
 Les instances principales doivent communiquer avec la base de données. Tous les détails de configuration requis pour se connecter à la base de données sont stockés dans un fichier de configuration: `application.properties `.
 Ce fichier de configuration attend certaines variables d'environnement, comme :
-*   MYSQL_USERNAME, 
-  * MYSQL_PASSWORD, 
-  * MYSQL_HOST, 
-  * MYSQL_DATABASE. 
+ * MYSQL_USERNAME, 
+ * MYSQL_PASSWORD, 
+ * MYSQL_HOST, 
+ * MYSQL_DATABASE. 
 
 L'image du docker de la base de données MySQL aussi attend certaines variables d'environnement comme:
-  * MYSQL_ROOT_PASSWORD, 
-  * MYSQL_USER, 
-  * MYSQL_PASSWORD, 
-  * MYSQL_DATABASE.
+ * MYSQL_ROOT_PASSWORD, 
+ * MYSQL_USER, 
+ * MYSQL_PASSWORD, 
+ * MYSQL_DATABASE.
 
 Nous transmettrons les valeurs de ces variables à Kubernetes via `app-configmap.yaml` et `app-secret.yaml`.
 
@@ -184,7 +184,7 @@ spec:
     app: mysql
   clusterIP: None  # Nous utilisons DNS, donc ClusterIP n'est pas pertinent 
 ```
-  * pour l'api
+ * pour l'api
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
