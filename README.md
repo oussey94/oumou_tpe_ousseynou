@@ -40,7 +40,7 @@ Maintenant que nous avons parcouru les bases de Kubernetes dans notre article, i
 * Base de données (serveur MySQL)
 * Back-end (application Java Spring Boot)
 
-Nous allons déployer tous ces composants sur un cluster Kubernetes. Nous aurons une réplique de la base de données, un réplique du back-end. L'instance back-end communiquera avec la base de données. Pour faciliter cette communication, nous devons configurer Kubernetes en conséquence.
+Nous allons déployer tous ces composants sur un cluster Kubernetes. Nous aurons une réplique de la base de données, une réplique du back-end. L'instance back-end communiquera avec la base de données. Pour faciliter cette communication, nous devons configurer Kubernetes en conséquence.
 
 ### Nous allons configurer le cluster en créant des objets Kubernetes 
 
@@ -77,7 +77,7 @@ Ce fichier de configuration attend certaines variables d'environnement, comme :
  * MYSQL_HOST, 
  * MYSQL_DATABASE. 
 
-L'image du docker de la base de données MySQL aussi attend certaines variables d'environnement comme:
+L'image Docker de la base de données MySQL aussi attend certaines variables d'environnement comme:
  * MYSQL_ROOT_PASSWORD, 
  * MYSQL_USER, 
  * MYSQL_PASSWORD, 
@@ -111,6 +111,7 @@ data:
 Nos pods seront configurés pour lire les variables d'environnements à partir du configMaps et du secrets.
 
 * Enfin nous crérons nos services, statefullset et déploiement:
+
   * pour la base de données
 ```yaml
 apiVersion: apps/v1
