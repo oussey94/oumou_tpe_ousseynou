@@ -30,7 +30,7 @@ docker-composer up -d
 
 ### =================================================================
 
-## Exemple simple d'utilisation Kubernetes avec MYSQL et Spring Boot
+## Exemple simple d'utilisation de Kubernetes avec MYSQL et Spring Boot
 
 ### [k8s-manifest](https://github.com/oussey94/oumou_tpe_ousseynou/tree/article-k8s/k8s-manifest).
 
