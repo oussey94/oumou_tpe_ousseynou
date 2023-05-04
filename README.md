@@ -28,9 +28,12 @@ les éléments liés à la base de données sont inclus dans le paramètre.
 
 docker-composer up -d
 
-### =======================================================================
+### =================================================================
 
 ## Exemple simple d'utilisation Kubernetes avec MYSQL et Spring Boot
+
+### [k8s-manifest](https://github.com/oussey94/oumou_tpe_ousseynou/tree/article-k8s/k8s-manifest).
+
 
 Maintenant que nous avons parcouru les bases de Kubernetes dans notre article, ici nous allons détailler un exemple simple de son utilisation. Dans cet exemple, nous allons déployer un api Web à l'aide de Kubernetes. Nous utiliserons Docker comme runtime de conteneur. L'application dans notre exemple comporte deux parties distinctes :
 
